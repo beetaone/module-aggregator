@@ -22,6 +22,29 @@ __HANDLER_PORT__ = config('HANDLER_PORT')
 # Interval data collector
 data = [ ]
 
+# set WeevAgator functions
+def last(data_array):
+    return data_array[-1]
+
+def first(data_array):
+    return data_array[0]
+
+def spread(data_array):
+    return max(data_array) - min(data_array)
+
+weevagator_functions = {
+    'mean': np.mean,
+    'sum': np.sum,
+    'min': min,
+    'max': max,
+    'stddv': np.std,
+    'last': last,
+    'first': first,
+    'spread': spread,
+    'count': len,
+    'median': np.median,
+}
+
 # Set default settings
 settings = {
     "interval_unit": 'ms',
@@ -88,34 +111,12 @@ def processing():
     count = len(data)
 
     if count != 0:
-        # select interval data
-        interval_data = data[:count]
-
-        # set WeevAgator functions
-        weevagator_functions = {
-            'mean': np.mean(interval_data),
-            'sum': np.sum(interval_data),
-            'min': min(interval_data),
-            'max': max(interval_data),
-            'stddv': np.std(interval_data),
-            'last': interval_data[-1],
-            'first': interval_data [0],
-            'spread': max(interval_data) - min(interval_data ),
-            'count': len(interval_data ),
-            'round': -1,
-            'median': np.median(interval_data ),
-            'floor': -1
-        }
-
-        # chooses a aggregation function from settings
-        function = settings['function']
-
         # processes data
-        processed_data = weevagator_functions[function]
+        processed_data = weevagator_functions[settings['function']](data[:count])
         #print("PROCESSED DATA", processed_data)
 
         # removes processed data
-        data[:] = data[count:]
+        del data[:count]
         
         # prepare output HTTP ReST API request
         # 1. change types from numpy type to python type (must do for JSON)
@@ -130,13 +131,13 @@ def processing():
         return_body = {
             str(settings["output_label"]): typed_processed_data,
             "data_type": data_type,
-            "unit": "Celsius"
+            "unit": settings["output_unit"]
         }
 
         # post request
         if __EGRESS_API_METHOD__ == "POST":
             resp = requests.post(url=f"http://{__EGRESS_API_HOST__}:{__EGRESS_API_PORT__}{__EGRESS_API_URI__}", json=return_body)
-            #print(f"The response :{resp} {resp.text}")
+            #print(f"THE RESPONSE:{resp} {resp.text}")
         else:
             log.exception(f"The HTTP Method not supportive.")
 
