@@ -5,10 +5,6 @@ import requests
 import numpy as np
 from decouple import config
 
-'''
-TODO: What are functions: round, floor, spread?
-'''
-
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -22,14 +18,22 @@ __HANDLER_PORT__ = config('HANDLER_PORT')
 # Interval data collector
 data = [ ]
 
-# set WeevAgator functions
 def last(data_array):
+    '''
+    Returns the last element in the array.
+    '''
     return data_array[-1]
 
 def first(data_array):
+    '''
+    Returns the first element in the array.
+    '''
     return data_array[0]
 
 def spread(data_array):
+    '''
+    Returns the spread of data in the array.
+    '''
     return max(data_array) - min(data_array)
 
 weevagator_functions = {
@@ -71,13 +75,11 @@ def handle():
     if not settingsSet:
         # set WeevAgator settings
         settings = request.get_json(force=True)
-        log.warning(f"Settings Request {settings}")
+        #log.warning(f"Settings Request {settings}")
         settingsSet = True
 
         # start processing intervals
         processing()
-        
-        return "Settings received."
     else:
         # receive data
         received_data = request.get_json(force=True)
@@ -87,7 +89,7 @@ def handle():
         parsed_data = [sample[settings['input_label']] for sample in received_data]
         data = data + parsed_data
         
-        return "Data received."
+    return '', 204
 
 def processing():
     '''
@@ -131,7 +133,7 @@ def processing():
         return_body = {
             str(settings["output_label"]): typed_processed_data,
             "data_type": data_type,
-            "unit": settings["output_unit"]
+            "input_unit": settings["output_unit"]
         }
 
         # post request
