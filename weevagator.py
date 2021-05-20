@@ -130,8 +130,8 @@ def processing():
         # post request
         if __EGRESS_API_METHOD__ == "POST":
             resp = requests.post(
-                url=f"{__EGRESS_API_HOST__}", data=return_body)
-            #print(return_body)
+                url=f"{__EGRESS_API_HOST__}", json=return_body)
+            # print(return_body)
             #print(f"THE RESPONSE:{resp} {resp.text}")
         else:
             log.exception(f"The HTTP Method not supportive.")
