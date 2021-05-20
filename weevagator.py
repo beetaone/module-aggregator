@@ -23,7 +23,8 @@ __OUTPUT_LABEL__ = config('OUTPUT_LABEL')
 __OUTPUT_UNIT__ = config('OUTPUT_UNIT')
 
 # Interval data collector
-data = [ ]
+data = []
+
 
 def last(data_array):
     '''
@@ -31,17 +32,20 @@ def last(data_array):
     '''
     return data_array[-1]
 
+
 def first(data_array):
     '''
     Returns the first element in the array.
     '''
     return data_array[0]
 
+
 def spread(data_array):
     '''
     Returns the spread of data in the array.
     '''
     return max(data_array) - min(data_array)
+
 
 weevagator_functions = {
     'mean': np.mean,
@@ -56,6 +60,7 @@ weevagator_functions = {
     'median': np.median,
 }
 
+
 @app.route('/handle', methods=['POST'])
 def handle():
     '''
@@ -63,7 +68,6 @@ def handle():
     '''
     global data
     # start processing intervals
-    processing()
 
     try:
         # receive data
@@ -75,8 +79,9 @@ def handle():
         data = data + parsed_data
     except:
         log.exception(f"Wrong data structure.")
-        
+
     return '', 204
+
 
 def processing():
     '''
@@ -106,7 +111,7 @@ def processing():
 
         # removes processed data
         del data[:count]
-        
+
         # prepare output HTTP ReST API request
         # 1. change types from numpy type to python type (must do for JSON)
         if isinstance(processed_data, np.int_):
@@ -125,10 +130,13 @@ def processing():
 
         # post request
         if __EGRESS_API_METHOD__ == "POST":
-            resp = requests.post(url=f"https://{__EGRESS_API_HOST__}", data=return_body)
+            resp = requests.post(
+                url=f"{__EGRESS_API_HOST__}", data=return_body)
             #print(f"THE RESPONSE:{resp} {resp.text}")
         else:
             log.exception(f"The HTTP Method not supportive.")
 
+
 if __name__ == "__main__":
     app.run(host=__HANDLER_HOST__, port=__HANDLER_PORT__)
+    processing()
