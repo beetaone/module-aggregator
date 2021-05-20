@@ -9,11 +9,18 @@ log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 __EGRESS_API_HOST__ = config('EGRESS_API_HOST')
-__EGRESS_API_PORT__ = config('EGRESS_API_PORT')
-__EGRESS_API_URI__ = config('EGRESS_API_URI')
 __EGRESS_API_METHOD__ = config('EGRESS_API_METHOD')
 __HANDLER_HOST__ = config('HANDLER_HOST')
 __HANDLER_PORT__ = config('HANDLER_PORT')
+
+#  Set module settings
+__INTERVAL_UNIT__ = config('INTERVAL_UNIT')
+__INTERVAL_PERIOD__ = float(config('INTERVAL_PERIOD'))
+__FUNCTION__ = config('FUNCTION')
+__INPUT_LABEL__ = config('INPUT_LABEL')
+__DATA_TYPE__ = config('DATA_TYPE')
+__OUTPUT_LABEL__ = config('OUTPUT_LABEL')
+__OUTPUT_UNIT__ = config('OUTPUT_UNIT')
 
 # Interval data collector
 data = [ ]
@@ -49,45 +56,25 @@ weevagator_functions = {
     'median': np.median,
 }
 
-# Set default settings
-settings = {
-    "interval_unit": 'ms',
-    "interval": 20,
-    "function": 'mean',
-    "input_label": 'temperature',
-    "data_type": float,
-    "output_label": 'differentialTemp',
-    "output_unit": 'Celsius'
-}
-
-# Flag if settings are set
-settingsSet = False
-
 @app.route('/handle', methods=['POST'])
 def handle():
     '''
-    Receive ReST API POST request. First request are WeevAgator settings.
-    The next requests are data.
+    Receive ReST API POST request with data.
     '''
-    global settings
-    global settingsSet
     global data
-    if not settingsSet:
-        # set WeevAgator settings
-        settings = request.get_json(force=True)
-        #log.warning(f"Settings Request {settings}")
-        settingsSet = True
+    # start processing intervals
+    processing()
 
-        # start processing intervals
-        processing()
-    else:
+    try:
         # receive data
         received_data = request.get_json(force=True)
         #print("RECEIVED DATA: ", received_data)
 
         # parse target data from the structure
-        parsed_data = [sample[settings['input_label']] for sample in received_data]
+        parsed_data = [sample[__INPUT_LABEL__] for sample in received_data]
         data = data + parsed_data
+    except:
+        log.exception(f"Wrong data structure.")
         
     return '', 204
 
@@ -98,13 +85,13 @@ def processing():
     '''
     # convert interval unit to seconds (must do for threading Timer)
     convert_interval_unit = {
-        'ms': settings['interval']/1000,
-        's': settings['interval'],
-        'm': settings['interval'] * 60,
-        'h': settings['interval'] * 3600,
-        'd': settings['interval'] * 3600 * 24,
+        'ms': __INTERVAL_PERIOD__/1000,
+        's': __INTERVAL_PERIOD__,
+        'm': __INTERVAL_PERIOD__ * 60,
+        'h': __INTERVAL_PERIOD__ * 3600,
+        'd': __INTERVAL_PERIOD__ * 3600 * 24,
     }
-    interval = convert_interval_unit[settings['interval_unit']]
+    interval = convert_interval_unit[__INTERVAL_UNIT__]
 
     # start thread with given interval
     threading.Timer(interval, processing).start()
@@ -114,7 +101,7 @@ def processing():
 
     if count != 0:
         # processes data
-        processed_data = weevagator_functions[settings['function']](data[:count])
+        processed_data = weevagator_functions[__FUNCTION__](data[:count])
         #print("PROCESSED DATA", processed_data)
 
         # removes processed data
@@ -131,14 +118,14 @@ def processing():
 
         # 2. build JSON body
         return_body = {
-            str(settings["output_label"]): typed_processed_data,
+            str(__OUTPUT_LABEL__): typed_processed_data,
             "data_type": data_type,
-            "input_unit": settings["output_unit"]
+            "input_unit": __OUTPUT_UNIT__
         }
 
         # post request
         if __EGRESS_API_METHOD__ == "POST":
-            resp = requests.post(url=f"http://{__EGRESS_API_HOST__}:{__EGRESS_API_PORT__}{__EGRESS_API_URI__}", json=return_body)
+            resp = requests.post(url=f"https://{__EGRESS_API_HOST__}", data=return_body)
             #print(f"THE RESPONSE:{resp} {resp.text}")
         else:
             log.exception(f"The HTTP Method not supportive.")
