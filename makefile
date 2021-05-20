@@ -13,5 +13,5 @@ install_local:
 .phony: install_local
 
 run_local:
-	python3 weevagator.py --egress_api_host 0.0.0.0
+	python3 weevagator.py
 .phony: run_local
