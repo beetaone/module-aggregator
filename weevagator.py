@@ -67,7 +67,6 @@ def handle():
     Receive ReST API POST request with data.
     '''
     global data
-    # start processing intervals
 
     try:
         # receive data
@@ -132,11 +131,13 @@ def processing():
         if __EGRESS_API_METHOD__ == "POST":
             resp = requests.post(
                 url=f"{__EGRESS_API_HOST__}", data=return_body)
+            #print(return_body)
             #print(f"THE RESPONSE:{resp} {resp.text}")
         else:
             log.exception(f"The HTTP Method not supportive.")
 
 
 if __name__ == "__main__":
-    app.run(host=__HANDLER_HOST__, port=__HANDLER_PORT__)
+    # start processing intervals
     processing()
+    app.run(host=__HANDLER_HOST__, port=__HANDLER_PORT__)
