@@ -1,51 +1,138 @@
 # WeevAgator
 
-| | |
-| --- | ---|
-| version | `v0.0.1` |
-| authors | `Jakub Grzelak`, `Sanyam Arya` |
-| docker image | `weevenetwork/weeve-weevagator` |
-| tech tags | `Python`, `Flask`, `Numpy`, `Docker` |
+|                |                                       |
+| -------------- | ------------------------------------- |
+| Name           | WeevAgator                            |
+| Version        | v0.0.1                                |
+| Dockerhub Link | weevenetwork/weeve-weevagator         |
+| authors        | Jakub Grzelak, Sanyam Arya            |
 
-_WeevAgator is a processing module responsible for aggregating data passing through weeve data services._ 
-_WeevAgator collects data within a time interval specified by a data service developer, and then it applies a chosen aggregation function._
-_This module is containerized using Docker._
+- [WeevAgator](#weevagator)
+  - [Description](#description)
+  - [Features](#features)
+  - [Environment Variables](#environment-variables)
+    - [Module Specific](#module-specific)
+    - [Set by the weeve Agent on the edge-node](#set-by-the-weeve-agent-on-the-edge-node)
+  - [Dependencies](#dependencies)
+  - [Input](#input)
+  - [Output](#output)
+  - [Docker Compose Example](#docker-compose-example)
 
-The following module features must be provided by a developer in a data service designer section on weeve platform:
-* **Interval Unit** - the unit for time interval,
-  * ms    _(milliseconds)_
-  * s     _(seconds)_
-  * m     _(minutes)_
-  * h     _(hours)_
-  * d     _(days)_
-* **Interval Period** - the time interval on which aggregation will be applied,
-  * type: integer
-* **Function** - the aggregation function to apply,
-  * mean      _(mean value that arrived within the specified interval)_
-  * max       _(maximum value)_
-  * spread    _(maximum - minimum value)_
-  * median    _(median value recorded within the interval)_
-  * sum       _(sum of all received values)_
-  * stddv     _(standard deviation of values)_
-  * count     _(number of data that arrived within the interval)_
-  * first     _(first recorded data)_
-  * min       _(minimum value)_
-  * last      _(last recorded data)_
-* **Input Label** - the input label on which anomaly is detected,
-  * type: string
-* **Data Type** - type of data in the above mentioned label,
-  * float
-  * integer
-* **Output Label** - the output label as which data is dispatched,
-  * type: string
-* **Output Unit** - the output unit in which data is dispatched,
-  * type: string
+## Description
 
-Other features required for establishing the inter-container communication between modules in a data service are set by weeve server.
-These include: egress api host, egress api method, handler host and port.
+WeevAgator is a processing module responsible for aggregating data passing through weeve data services.
+WeevAgator collects data within a time interval specified by a data service developer, and then it applies a chosen aggregation function.
+This module is containerized using Docker.
 
-WeevAgator requires the following Python packages that will be installed on a container built:
-* Flask v1.1.1
-* requests
-* NumPy
-* python-decouple v3.4
+## Features
+
+- Applies aggregation functions to data
+- Flask ReST client
+- Request - sends HTTP Request to the next module
+
+Supported functions:
+- mean (mean value that arrived within the specified interval)
+- max (maximum value)
+- spread (maximum - minimum value)
+- median (median value recorded within the interval)
+- sum (sum of all received values)
+- stddv (standard deviation of values)
+- count (number of data that arrived within the interval)
+- first (first recorded data)
+- min (minimum value)
+- last (last recorded data)
+
+
+## Environment Variables
+
+### Module Specific
+
+The following module configurations can be provided in a data service designer section on weeve platform:
+
+| Name                 | Environment Variables     | type     | Description                                              |
+| -------------------- | ------------------------- | -------- | -------------------------------------------------------- |
+| Interval Unit        | INTERVAL_UNIT             | string   | The unit for time interval (ms, s, m, h, d)              |
+| Interval Period      | INTERVAL_PERIOD           | integer  | The time interval on which aggregation will be applied   |
+| Function             | FUNCTION                  | string   | Aggregation function to apply (mean, max, spread, median, sum, stddv, count, first, min, last) |
+| Input Label          | INPUT_LABEL               | string   | The input label on which anomaly is detected             |
+| Data Type            | DATA_TYPE                 | string   | Type of data in the above mentioned label                |
+| Output Label         | OUTPUT_LABEL              | string   | The output label as which data is dispatched             |
+| Output Unit          | OUTPUT_UNIT               | string   | The output unit in which data is dispatched              |
+
+Other features required for establishing the inter-container communication between modules in a data service are set by weeve agent.
+
+### Set by the weeve Agent on the edge-node
+
+| Environment Variables | type   | Description                            |
+| --------------------- | ------ | -------------------------------------- |
+| EGRESS_API_HOST       | string | HTTP ReST endpoint for the next module |
+| MODULE_NAME           | string | Name of the module                     |
+
+## Dependencies
+
+```txt
+Flask==1.1.1
+requests
+NumPy
+python-decouple==3.4
+```
+
+## Input
+
+Input to this module is JSON body single object:
+
+Example:
+
+```node
+{
+  temperature: 15,
+  input_unit: Celsius
+}
+```
+
+## Output
+
+Output of this module is JSON body array of objects.
+
+Output of this module is JSON body:
+
+```node
+{
+    "<OUTPUT_LABEL>": <Processed data>,
+    "output_unit": <OUTPUT_UNIT>,
+}
+```
+ 
+* Here `OUTPUT_LABEL` and `OUTPUT_UNIT` are specified at the module creation and `Processed data` is data processed by Module Main function.
+
+Example:
+
+```node
+{
+  meanTemp: 54.7,
+  output_unit: Celsius,
+}
+```
+
+## Docker Compose Example
+
+```yml
+version: "3"
+services:
+  weevagator:
+    image: weevenetwork/weeve-weevagator
+    environment:
+      EGRESS_API_HOST: "https://hookb.in/pzaBWG9rKoSXNNqwBo3o"
+      EGRESS_API_METHOD: "POST"
+      HANDLER_HOST: "0.0.0.0"
+      HANDLER_PORT: "5000"
+      INTERVAL_UNIT: "ms"
+      INTERVAL_PERIOD: 10000
+      FUNCTION: "mean"
+      INPUT_LABEL: "temperature"
+      DATA_TYPE: "float"
+      OUTPUT_LABEL: "differentialTemp"
+      OUTPUT_UNIT: "Celsius"
+    ports:
+      - 5000:80
+```
