@@ -73,8 +73,7 @@ Other features required for establishing the inter-container communication betwe
 ```txt
 Flask==1.1.1
 requests
-NumPy
-python-decouple==3.4
+python-decouple
 ```
 
 ## Input
