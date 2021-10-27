@@ -24,7 +24,19 @@ def send_data(data: json, timestamp=time.time()) -> bool:
     }
 
     try:
-        post(url=f"{WEEVE['EGRESS_API_HOST']}", json=return_body)
-        return True
+        # URL Convetion 1
+        if not WEEVE['EGRESS_URL']:
+            resp = post(url=f"{WEEVE['EGRESS_SCHEME']}://{WEEVE['EGRESS_HOST']}:{WEEVE['EGRESS_PORT']}/{WEEVE['EGRESS_PATH']}", json=return_body)
+        # URL Convetion 2
+        else:
+            resp = post(url=f"{WEEVE['EGRESS_URL']}", json=return_body)
+        
+        # success = 200
+        if resp.status_code == 200:
+            return True
+        # failure = 500
+        else: 
+            return False
+
     except Exception:
         return False

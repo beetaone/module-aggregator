@@ -3,7 +3,7 @@
 |                |                                       |
 | -------------- | ------------------------------------- |
 | Name           | WeevAgator                            |
-| Version        | v0.0.1                                |
+| Version        | v0.0.2                                |
 | Dockerhub Link | weevenetwork/weeve-weevagator         |
 | authors        | Jakub Grzelak, Sanyam Arya            |
 
@@ -63,10 +63,18 @@ Other features required for establishing the inter-container communication betwe
 
 ### Set by the weeve Agent on the edge-node
 
-| Environment Variables | type   | Description                            |
-| --------------------- | ------ | -------------------------------------- |
-| EGRESS_API_HOST       | string | HTTP ReST endpoint for the next module |
-| MODULE_NAME           | string | Name of the module                     |
+| Environment Variables | type   | Description                                    |
+| --------------------- | ------ | ---------------------------------------------- |
+| MODULE_NAME           | string | Name of the module                             |
+| MODULE_TYPE           | string | Type of the module (INGRESS, PROCESS, EGRESS)  |
+| EGRESS_SCHEME         | string | URL Scheme                                     |
+| EGRESS_HOST           | string | URL target host                                |
+| EGRESS_PORT           | string | URL target port                                |
+| EGRESS_PATH           | string | URL target path                                |
+| EGRESS_URL            | string | HTTP ReST endpoint for the next module         |
+| INGRESS_HOST          | string | Host to which data will be received            |
+| INGRESS_PORT          | string | Port to which data will be received            |
+| INGRESS_PATH          | string | Path to which data will be received            |
 
 ## Dependencies
 
@@ -121,10 +129,9 @@ services:
   weevagator:
     image: weevenetwork/weeve-weevagator
     environment:
-      EGRESS_API_HOST: "https://hookb.in/pzaBWG9rKoSXNNqwBo3o"
-      EGRESS_API_METHOD: "POST"
-      HANDLER_HOST: "0.0.0.0"
-      HANDLER_PORT: "5000"
+      EGRESS_URL: "https://hookb.in/pzaBWG9rKoSXNNqwBo3o"
+      INGRESS_HOST: "0.0.0.0"
+      INGRESS_PORT: "5000"
       INTERVAL_UNIT: "ms"
       INTERVAL_PERIOD: 10000
       FUNCTION: "mean"
