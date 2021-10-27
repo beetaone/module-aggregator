@@ -36,7 +36,7 @@ def main_routes(app: Flask):
 
         if err:
             app.logger.error('Error: %s', err)
-            return err, HTTP_CODES['BAD_REQUEST']
+            return err, HTTP_CODES['INTERNAL_SERVER_ERROR']
 
         module_output, err = module_main(parsed_data)
 
@@ -45,7 +45,7 @@ def main_routes(app: Flask):
             return err, HTTP_CODES['INTERNAL_SERVER_ERROR']
 
         if not module_output:
-            return "", HTTP_CODES['NO_CONTENT']
+            return "SUCCESS", HTTP_CODES['OK']
 
         app.logger.error("Error while transfering")
         return "Error while transfering", HTTP_CODES['INTERNAL_SERVER_ERROR']

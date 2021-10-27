@@ -1,0 +1,90 @@
+version: 1.0.0
+name: WeevAgator
+description: Data Sanitization and Anomaly Detection
+icon: https://icons-020-demo.s3.eu-central-1.amazonaws.com/Aggregator.png
+type: process
+tags:
+  - WeevAgator
+  - process
+  - Data
+  - Sanitization
+  - Anomaly
+  - Detection
+categories:
+  - id: category
+    name: Aggregate
+image:
+  name: weevenetwork/weeve-weevagator
+  tag: latest
+environments:
+  - key: INTERVAL_UNIT
+    description: Unit for time interval
+    value: ''
+    default: ms
+    type: enum
+    options:
+      - ms
+      - s
+      - m
+      - h
+      - d
+    name: Interval Unit
+  - key: INTERVAL_PERIOD
+    description: The Time Interval on which the aggregation will be applied
+    value: ''
+    default: 1000
+    type: integer
+    name: Interval Period
+  - key: FUNCTION
+    description: The Aggregation function to apply
+    value: ''
+    default: mean
+    type: enum
+    options:
+      - mean
+      - max
+      - spread
+      - median
+      - sum
+      - stddv
+      - count
+      - first
+      - min
+      - last
+    name: Function
+commands:
+  - key: INPUT_LABEL
+    description: The input label on which anomaly is detected
+    value: ''
+    default: temperature
+    type: string
+    name: Input Label
+  - key: DATA_TYPE
+    description: Type of data in the above mentioned label
+    value: ''
+    default: float
+    type: enum
+    options:
+      - float
+      - integer
+    name: Data Type
+  - key: OUTPUT_LABEL
+    description: The out label as which data is dispatched
+    value: ''
+    default: differentialTemperature
+    type: string
+    name: Output Label
+  - key: OUTPUT_UNIT
+    description: The out unit in which data is dispatched
+    value: ''
+    default: Celsius
+    type: string
+    name: Output Unit
+document:
+  ports: []
+  volumes: []
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+    max_attempts: 3
+    window: 120s

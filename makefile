@@ -1,11 +1,11 @@
 SHELL := /bin/bash
 MODULE=weevenetwork/weeve-weevagator
 create_image:
-	docker build -t ${MODULE} .
+	docker build -t ${MODULE} . -f image/Dockerfile
 .phony: create_image
 
 create_and_push_multi_platform:
-	docker buildx build --platform linux/amd64,linux/arm,linux/arm64 -t ${MODULE} --push .
+	docker buildx build --platform linux/amd64,linux/arm,linux/arm64 -t ${MODULE} --push . -f image/Dockerfile
 .phony: create_and_push_multi_platform
 
 push_latest:
@@ -13,7 +13,7 @@ push_latest:
 .phony: push_latest
 
 run_image:
-	docker run -p 8000:5000 --rm ${MODULE}:latest
+	docker run -p 5000:80 --rm --env-file=./config.env ${MODULE}:latest
 .phony: run_image
 
 lint:
@@ -21,10 +21,9 @@ lint:
 .phony: lint
 
 install_local:
-	pip3 install -r requirements.txt
+	pip3 install -r image/requirements.txt
 .phony: install_local
 
 run_local:
-	 python main.py
+	 python image/src/main.py
 .phony: run_local
-
