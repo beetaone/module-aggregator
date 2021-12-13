@@ -4,7 +4,7 @@
 | -------------- | ------------------------------------- |
 | Name           | WeevAgator                            |
 | Version        | v0.0.2                                |
-| Dockerhub Link | weevenetwork/weeve-weevagator         |
+| Dockerhub Link | [weevenetwork/weeve-weevagator](https://hub.docker.com/r/weevenetwork/weeve-weevagator)         |
 | authors        | Jakub Grzelak, Sanyam Arya            |
 
 - [WeevAgator](#weevagator)
@@ -106,7 +106,7 @@ Output of this module is JSON body:
 ```node
 {
     "<OUTPUT_LABEL>": <Processed data>,
-    "output_unit": <OUTPUT_UNIT>,
+    "unit": <OUTPUT_UNIT>,
 }
 ```
  
@@ -117,7 +117,7 @@ Example:
 ```node
 {
   meanTemp: 54.7,
-  output_unit: Celsius,
+  unit: Celsius,
 }
 ```
 
