@@ -19,7 +19,7 @@ def send_data(data: json, timestamp=time.time()) -> bool:
 
     return_body = {
         APPLICATION['OUTPUT_LABEL']: data,
-        "outputUnit": APPLICATION['OUTPUT_UNIT'],
+        "unit": APPLICATION['OUTPUT_UNIT'],
         f"{WEEVE['MODULE_NAME']}Time": timestamp
     }
 
