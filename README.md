@@ -1,8 +1,8 @@
-# WeevAgator
+# Aggregator
 
 |                |                                       |
 | -------------- | ------------------------------------- |
-| Name           | WeevAgator                            |
+| Name           | Aggregator                            |
 | Version        | v0.0.2                                |
 | Dockerhub Link | [weevenetwork/weeve-weevagator](https://hub.docker.com/r/weevenetwork/weeve-weevagator)         |
 | authors        | Jakub Grzelak, Sanyam Arya            |
@@ -20,8 +20,8 @@
 
 ## Description
 
-WeevAgator is a processing module responsible for aggregating data passing through weeve data services.
-WeevAgator collects data within a time interval specified by a data service developer, and then it applies a chosen aggregation function.
+Aggregator is a processing module responsible for aggregating data passing through weeve data services.
+Aggregator collects data within a time interval specified by a data service developer, and then it applies a chosen aggregation function.
 This module is containerized using Docker.
 
 ## Features
