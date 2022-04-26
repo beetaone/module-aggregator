@@ -4,10 +4,10 @@
 | -------------- | ------------------------------------- |
 | Name           | Aggregator                            |
 | Version        | v0.0.2                                |
-| Dockerhub Link | [weevenetwork/weeve-weevagator](https://hub.docker.com/r/weevenetwork/weeve-weevagator)         |
+| Dockerhub Link | [weevenetwork/weeve-aggregator](https://hub.docker.com/r/weevenetwork/weeve-aggregator)         |
 | authors        | Jakub Grzelak, Sanyam Arya            |
 
-- [WeevAgator](#weevagator)
+- [Aggregator](#aggregator)
   - [Description](#description)
   - [Features](#features)
   - [Environment Variables](#environment-variables)
@@ -126,8 +126,8 @@ Example:
 ```yml
 version: "3"
 services:
-  weevagator:
-    image: weevenetwork/weeve-weevagator
+  aggregator:
+    image: weevenetwork/weeve-aggregator
     environment:
       EGRESS_URL: "https://hookb.in/pzaBWG9rKoSXNNqwBo3o"
       INGRESS_HOST: "0.0.0.0"

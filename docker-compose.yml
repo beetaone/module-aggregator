@@ -1,6 +1,6 @@
 version: "3"
 services:
-  weeve-weevagator:
+  weeve-aggregator:
     build:
       context: .
       dockerfile: Dockerfile
