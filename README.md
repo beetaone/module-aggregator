@@ -4,7 +4,7 @@
 | -------------- | ------------------------------------- |
 | Name           | Aggregator                            |
 | Version        | v0.0.2                                |
-| Dockerhub Link | [weevenetwork/weeve-aggregator](https://hub.docker.com/r/weevenetwork/weeve-aggregator)         |
+| Dockerhub Link | [weevenetwork/aggregator](https://hub.docker.com/r/weevenetwork/aggregator)         |
 | authors        | Jakub Grzelak, Sanyam Arya            |
 
 - [Aggregator](#aggregator)
@@ -79,7 +79,7 @@ Other features required for establishing the inter-container communication betwe
 ## Dependencies
 
 ```txt
-Flask==1.1.1
+Flask==2.0.3
 requests
 python-decouple
 ```
@@ -127,7 +127,7 @@ Example:
 version: "3"
 services:
   aggregator:
-    image: weevenetwork/weeve-aggregator
+    image: weevenetwork/aggregator
     environment:
       EGRESS_URL: "https://hookb.in/pzaBWG9rKoSXNNqwBo3o"
       INGRESS_HOST: "0.0.0.0"
