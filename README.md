@@ -1,144 +1,133 @@
-# Aggregator
+# Python Processing Module Boilerplate
 
-|                |                                       |
-| -------------- | ------------------------------------- |
-| Name           | Aggregator                            |
-| Version        | v0.0.2                                |
-| Dockerhub Link | [weevenetwork/aggregator](https://hub.docker.com/r/weevenetwork/aggregator)         |
-| authors        | Jakub Grzelak, Sanyam Arya            |
+|              |                                                                  |
+| ------------ | ---------------------------------------------------------------- |
+| name         | Python Processing Module Boilerplate                             |
+| version      | v2.0.0                                                           |
+| GitHub       | [python-processing-module-boilerplate](https://linktodockerhub/) |
+| authors      | Jakub Grzelak, Nithin Saai                                       |
 
-- [Aggregator](#aggregator)
+***
+## Table of Content
+
+- [Python Processing Module Boilerplate](#python-processing-module-boilerplate)
+  - [Table of Content](#table-of-content)
   - [Description](#description)
-  - [Features](#features)
-  - [Environment Variables](#environment-variables)
-    - [Module Specific](#module-specific)
-    - [Set by the weeve Agent on the edge-node](#set-by-the-weeve-agent-on-the-edge-node)
+  - [Directory Structure](#directory-structure)
+    - [File Tree](#file-tree)
+  - [Module Variables](#module-variables)
+  - [As a module developer](#as-a-module-developer)
+  - [Module Testing](#module-testing)
   - [Dependencies](#dependencies)
-  - [Input](#input)
-  - [Output](#output)
-  - [Docker Compose Example](#docker-compose-example)
+***
 
-## Description
+## Description 
 
-Aggregator is a processing module responsible for aggregating data passing through weeve data services.
-Aggregator collects data within a time interval specified by a data service developer, and then it applies a chosen aggregation function.
-This module is containerized using Docker.
+This is a Python Processing Boilerplate module and it serves as a starting point for developers to build process modules for weeve platform and data services.
+Navigate to [As a module developer](#as-a-module-developer) to learn how to use this module. You can also explore our weeve documentation on [weeve Modules](https://docs.weeve.engineering/concepts/edge-applications/weeve-modules) and [module tutorials](https://docs.weeve.engineering/guides/how-to-create-a-weeve-module) to learn more details. 
 
-## Features
+## Directory Structure
 
-- Applies aggregation functions to data
-- Flask ReST client
-- Request - sends HTTP Request to the next module
+Most important resources:
 
-Supported functions:
-- mean (mean value that arrived within the specified interval)
-- max (maximum value)
-- spread (maximum - minimum value)
-- median (median value recorded within the interval)
-- sum (sum of all received values)
-- stddv (standard deviation of values)
-- count (number of data that arrived within the interval)
-- first (first recorded data)
-- min (minimum value)
-- last (last recorded data)
+| name              | description                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| src               | All source code related to the module (API and module code).                                           |
+| src/main.py       | Entry-point for the module.                                                                            |
+| src/api           | Code responsible for setting module's API and communication with weeve ecosystem.                      |
+| src/module        | Code related to the module's business logic. This is working directory for module developers.          |
+| docker            | All resources related to Docker (Dockerfile, docker-entrypoint.sh, docker-compose.yml).                |
+| test              | All resources related to automating testing of the module in development process.                      |
+| example.env       | Holds examples of environment variables for running the module.                                        |
+| requirements.txt  | A list of module dependencies.                                                                         |
+| Module.yaml       | Module's YAML file that is later used by weeve platform Data Service Designer                          |
 
+### File Tree
 
-## Environment Variables
+```bash
+├── src
+│   ├── api
+│   │   ├── __init__.py
+│   │   ├── log.py # log configurations
+│   │   ├── processing_thread.py # a separate thread responsible for triggering data processing and sending to the next module
+│   │   ├── send_data.py # sends data to the next module
+│   │   └── request_handler.py # handles module's API and receives data from a previous module
+│   ├── module
+│   │   ├── main.py # [*] main logic for the module
+│   │   └── validator.py # [*] validation logic for incoming data
+│   └── main.py # module entrypoint
+├── docker
+│   ├── .dockerignore
+│   ├── docker-compose.yml
+│   ├── docker-entrypoint.sh
+│   └── Dockerfile
+├── test
+│   ├── assets
+│   │   ├── input.json # input data for tests (sample module input)
+│   │   └── expected_output.json # expected output data for tests (sample module output)
+│   ├── boilerplate_test.py # script handling module testing
+│   ├── docker-compose.test.yml
+│   ├── Dockerfile.listener # dockerfile for a container used to simulate egress endpoint
+│   ├── listener.py # script implementing egress endpoint
+│   └── test.env # environment variables for tests
+├── example.env # sample environment variables for the module
+├── Module.yaml # used by weeve platform to generate resource in Data Service Designer section
+├── makefile
+├── README.md
+├── example.README.md # README template for writing module documentation
+├── requirements_dev.txt # module dependencies for testing, used for building Docker image
+└── requirements.txt # module dependencies, used for building Docker image
+```
 
-### Module Specific
+## Module Variables
 
-The following module configurations can be provided in a data service designer section on weeve platform:
+There are 5 module variables that are required by each module to correctly function within weeve ecosystem. In development, these variables can overridden for testing purposes. In production, these variables are set by weeve Agent.
 
-| Name                 | Environment Variables     | type     | Description                                              |
-| -------------------- | ------------------------- | -------- | -------------------------------------------------------- |
-| Interval Unit        | INTERVAL_UNIT             | string   | The unit for time interval (ms, s, m, h, d)              |
-| Interval Period      | INTERVAL_PERIOD           | integer  | The time interval on which aggregation will be applied   |
-| Function             | FUNCTION                  | string   | Aggregation function to apply (mean, max, spread, median, sum, stddv, count, first, min, last) |
-| Input Label          | INPUT_LABEL               | string   | The input label on which anomaly is detected             |
-| Data Type            | DATA_TYPE                 | string   | Type of data in the above mentioned label                |
-| Output Label         | OUTPUT_LABEL              | string   | The output label as which data is dispatched             |
-| Output Unit          | OUTPUT_UNIT               | string   | The output unit in which data is dispatched              |
+| Environment Variables | type   | Description                                       |
+| --------------------- | ------ | ------------------------------------------------- |
+| MODULE_NAME           | string | Name of the module                                |
+| MODULE_TYPE           | string | Type of the module (Input, Processing, Output)    |
+| LOG_LEVEL             | string | Allowed log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL. Refer to `logging` package documentation. |
+| INGRESS_HOST          | string | Host to which data will be received               |
+| INGRESS_PORT          | string | Port to which data will be received               |
+| EGRESS_URLS           | string | HTTP ReST endpoint for the next module            |
 
-Other features required for establishing the inter-container communication between modules in a data service are set by weeve agent.
+## As a module developer
 
-### Set by the weeve Agent on the edge-node
+RECOMMENDED:
+Make sure you have [virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
 
-| Environment Variables | type   | Description                                    |
-| --------------------- | ------ | ---------------------------------------------- |
-| MODULE_NAME           | string | Name of the module                             |
-| MODULE_TYPE           | string | Type of the module (INGRESS, PROCESS, EGRESS)  |
-| EGRESS_SCHEME         | string | URL Scheme                                     |
-| EGRESS_HOST           | string | URL target host                                |
-| EGRESS_PORT           | string | URL target port                                |
-| EGRESS_PATH           | string | URL target path                                |
-| EGRESS_URL            | string | HTTP ReST endpoint for the next module         |
-| INGRESS_HOST          | string | Host to which data will be received            |
-| INGRESS_PORT          | string | Port to which data will be received            |
-| INGRESS_PATH          | string | Path to which data will be received            |
+Install the dependencies with `make install_dev`
+
+A module developer needs to add all the configuration and business logic.
+
+All the module logic can be written in the module package in `src/module` directory.
+
+   * The files can me modified for the module
+      1. `module/validator.py`
+         * The function `data_validation` takes the JSON data received from the previous module.
+         * Incoming data can be validated here.
+         * Checks if data is of type permitted by a module (i.e. `dict` or `list`)>
+         * Checks if data contains required fields.
+         * Returns Error if data are not valid.
+      2. `module/module.py`
+         * The function `module_main` takes the JSON data received from the previous module.
+         * All the business logic about modules are written here.
+         * Returns processed data and error message.
+
+## Module Testing
+
+To test module navigate to `test` directory. In `test/assets` edit both .json file to provide input for the module and expected output. During a test, data received from the listeners are compared against expected output data. You can run tests with `make run_test`.
 
 ## Dependencies
 
-```txt
-Flask==2.0.3
-requests
-python-decouple
-```
+The following are module dependencies:
 
-## Input
+* bottle
+* requests
 
-Input to this module is JSON body single object:
+The following are developer dependencies:
 
-Example:
-
-```node
-{
-  temperature: 15,
-  input_unit: Celsius
-}
-```
-
-## Output
-
-Output of this module is JSON body array of objects.
-
-Output of this module is JSON body:
-
-```node
-{
-    "<OUTPUT_LABEL>": <Processed data>,
-    "unit": <OUTPUT_UNIT>,
-}
-```
- 
-* Here `OUTPUT_LABEL` and `OUTPUT_UNIT` are specified at the module creation and `Processed data` is data processed by Module Main function.
-
-Example:
-
-```node
-{
-  meanTemp: 54.7,
-  unit: Celsius,
-}
-```
-
-## Docker Compose Example
-
-```yml
-version: "3"
-services:
-  aggregator:
-    image: weevenetwork/aggregator
-    environment:
-      EGRESS_URL: "https://hookb.in/pzaBWG9rKoSXNNqwBo3o"
-      INGRESS_HOST: "0.0.0.0"
-      INGRESS_PORT: "5000"
-      INTERVAL_UNIT: "ms"
-      INTERVAL_PERIOD: 10000
-      FUNCTION: "mean"
-      INPUT_LABEL: "temperature"
-      DATA_TYPE: "float"
-      OUTPUT_LABEL: "differentialTemp"
-      OUTPUT_UNIT: "Celsius"
-    ports:
-      - 5000:80
-```
+* pytest
+* flake8
+* black
