@@ -1,0 +1,46 @@
+version: "3.0"
+networks:
+  default:
+    name: boilerplate_network
+services:
+
+  boilerplate:
+    # image: weevenetwork/boilerplate
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: boilerplate_test_container
+    ports:
+      - 80:80
+    env_file:
+      - test.env
+
+
+  listener1:
+    build:
+      context: ../
+      dockerfile: test/Dockerfile.listener
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "9000"
+      OUTPUT_FILE: "/app/artifacts/listener1_output.json"
+    ports:
+      - 9000:9000
+    volumes:
+      - $PWD/test/artifacts:/app/artifacts/
+    container_name: listener1
+
+
+  listener2:
+    build:
+      context: ../
+      dockerfile: test/Dockerfile.listener
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "9001"
+      OUTPUT_FILE: "/app/artifacts/listener2_output.json"
+    ports:
+      - 9001:9001
+    volumes:
+      - $PWD/test/artifacts:/app/artifacts/
+    container_name: listener2

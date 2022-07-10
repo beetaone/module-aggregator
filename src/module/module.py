@@ -1,31 +1,35 @@
+"""
+This file implements module's main logic.
+Data processing should happen here.
+
+Edit this file to implement your module.
+"""
+
+from logging import getLogger
+from .params import PARAMS
+from api.send_data import send_data
+
 import threading
 import math
-from flask import Flask
-import time
-from app.config import APPLICATION
-from app.weeve.egress import send_data
+
+log = getLogger("module")
 
 #  Set module settings
-__INTERVAL_UNIT__ = APPLICATION['INTERVAL_UNIT']
-__INTERVAL_PERIOD__ = APPLICATION['INTERVAL_PERIOD']
-__FUNCTION__ = APPLICATION['FUNCTION']
-__INPUT_LABEL__ = APPLICATION['INPUT_LABEL']
-__DATA_TYPE__ = APPLICATION['DATA_TYPE']
-__OUTPUT_LABEL__ = APPLICATION['OUTPUT_LABEL']
-__OUTPUT_UNIT__ = APPLICATION['OUTPUT_UNIT']
+__INTERVAL_UNIT__ = PARAMS['INTERVAL_UNIT']
+__INTERVAL_PERIOD__ = PARAMS['INTERVAL_PERIOD']
+__FUNCTION__ = PARAMS['FUNCTION']
+__INPUT_LABEL__ = PARAMS['INPUT_LABEL']
+__OUTPUT_LABEL__ = PARAMS['OUTPUT_LABEL']
 
 # Interval data collector
 data = []
-
-# reference Flask app for logging
-app = None
 
 def mean(data_array):
     '''
     Returns the mean of data in the array.
     '''
     return sum(data_array)/len(data_array)
-    
+
 def std(data_array):
     '''
     Returns the standard deviation of data in the array.
@@ -60,9 +64,9 @@ def median(data_array):
     '''
     if len(data_array) == 0:
         return None
-    
+
     data_array.sort()
-    
+
     if len(data_array)%2 == 0:
         return (data_array[int(len(data_array)/2) - 1] + data_array[int(len(data_array)/2)])/2
     else:
@@ -80,11 +84,6 @@ weevagator_functions = {
     'count': len,
     'median': median,
 }
-
-def set_module_app(appi: Flask):
-    global app
-    app = appi
-
 
 def frequency_processing():
     '''
@@ -110,28 +109,45 @@ def frequency_processing():
     if count != 0:
         # processes data
         processed_data = weevagator_functions[__FUNCTION__](data[:count])
-        #print("PROCESSED DATA", processed_data)
 
-        # send data
-        sent = send_data(processed_data)
-        if not sent:
-            app.logger.error("Error while transfering")
+        log.debug("Processed data : %s", processed_data)
+
+        # send data to the next module
+        return_body = {
+            PARAMS['OUTPUT_LABEL']: processed_data,
+        }
+
+        send_error = send_data(return_body)
+
+        if send_error:
+            log.error(send_error)
+        else:
+            log.debug("Data sent.")
 
         # remove old data
         del data[:count]
 
 
-def module_main(received_data):
-    """implement module logic here
+
+def module_main(received_data: any) -> [any, str]:
+    """
+    Process received data by implementing module's main logic.
+    Function description should not be modified.
 
     Args:
-        received_data ([JSON Object]): [The output of data_validation function]
+        received_data (any): Data received by module and validated.
 
     Returns:
-        [string, string]: [data, error]
+        str: Error message if error occurred, otherwise None.
+
     """
-    global data
+
+    log.debug("Processing ...")
+
     try:
+        # YOUR CODE HERE
+        global data
+
         if type(received_data) == dict:
             data.append(received_data[__INPUT_LABEL__])
         else:
@@ -139,6 +155,7 @@ def module_main(received_data):
             parsed_data = [sample[__INPUT_LABEL__] for sample in received_data]
             data = data + parsed_data
 
-        return None, None
-    except Exception:
-        return None, "Unable to perform the module logic"
+        return None
+
+    except Exception as e:
+        return f"Exception in the module business logic: {e}"
