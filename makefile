@@ -1,6 +1,7 @@
 SHELL := /bin/bash # to enable source command in run_app
 
-MODULE=weevenetwork/boilerplate
+MODULE=weevenetwork/aggregator
+VERSION_NAME=v1.0.0
 
 install_dev:
 	python3 -m pip install -r requirements_dev.txt
@@ -16,12 +17,16 @@ run_app:
 .phony: run_app
 
 create_image:
-	docker build -t ${MODULE} . -f docker/Dockerfile
+	docker build -t ${MODULE}:${VERSION_NAME} . -f docker/Dockerfile
 .phony: create_image
 
 run_image:
-	docker run -p 80:80 --rm --env-file=./.env ${MODULE}:latest
+	docker run -p 80:80 --rm --env-file=./.env ${MODULE}:${VERSION_NAME}
 .phony: run_image
+
+debug_image:
+	docker run -p 80:80 --rm --env-file=./.env --entrypoint /bin/bash -it ${MODULE}:${VERSION_NAME}
+.phony: debug_image
 
 run_docker_compose:
 	docker-compose -f docker/docker-compose.yml up
@@ -37,11 +42,11 @@ run_test:
 .phony: run_test
 
 push_latest:
-	docker image push ${MODULE}
+	docker image push ${MODULE}:${VERSION_NAME}
 .phony: push_latest
 
 create_and_push_multi_platform:
-	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7 -t ${MODULE} --push . -f docker/Dockerfile
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7 -t ${MODULE}:${VERSION_NAME} --push . -f docker/Dockerfile
 .phony: create_and_push_multi_platform
 
 run_listener:
