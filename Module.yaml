@@ -63,7 +63,11 @@ envs:                                   # Array of environment variables that wi
     options: []
     dependencies: []
 ports: []
+envPorts: []
 mounts: []
+envMounts: []
+devices: []
+envDevices: []
 tags:
   - Aggregator
   - process
