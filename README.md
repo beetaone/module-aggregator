@@ -3,7 +3,7 @@
 |                |                                       |
 | -------------- | ------------------------------------- |
 | Name           | Aggregator                           |
-| Version        | v1.0.0                                |
+| Version        | v1.0.1                                |
 | DockerHub | [weevenetwork/aggregator](https://hub.docker.com/r/weevenetwork/aggregator) |
 | authors        | Jakub Grzelak, Sanyam Arya                    |
 
@@ -92,7 +92,7 @@ Output of this module is JSON body:
     "<OUTPUT_LABEL>": <Processed data>,
 }
 ```
- 
+
 * Here `OUTPUT_LABEL` is specified at the module creation and `Processed data` is data processed by Module Main function.
 
 Example:

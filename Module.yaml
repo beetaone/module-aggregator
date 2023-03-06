@@ -1,14 +1,14 @@
 displayName: 'Aggregator'       # Display name for the module that will be displayed in the UI.
 moduleName: 'aggregator'        # Module name that will be used to reference the module, and uniquely identify the module and their versions.
 description: 'Apply aggregation functions to your data.'       # Module description that will be displayed in the UI.
-versionName: 'v1.0.0'                    # Module version name that will be used to reference the module version, and uniquely identify the module version with a common name.
+versionName: 'v1.0.1'                    # Module version name that will be used to reference the module version, and uniquely identify the module version with a common name.
 isPublic: true                          # Boolean value that indicates if the module is Public or Private.
 categories:                             # Array of category that will be used to group the module in the UI.
   - 'Aggregate'
 type: 'Processing'      # Module type (Input, Processing, Output) that will be used to group the module in the UI.
 image:
   name: 'weevenetwork/aggregator'     # Image name from the docker registry.
-  tag: 'v1.0.0'                               # Image tag from the docker registry.
+  tag: 'v1.0.1'                               # Image tag from the docker registry.
   homepage: 'https://hub.docker.com/r/weevenetwork/aggregator'      # Image homepage from the docker registry.
 repository: 'https://github.com/weeve-modules/aggregator'     # Repository URL to source code.
 envs:                                   # Array of environment variables that will be used to configure the module. Also used to show related fields on the UI.
@@ -27,7 +27,7 @@ envs:                                   # Array of environment variables that wi
   - name: Interval Period
     key: INTERVAL_PERIOD
     description: The time interval on which the aggregation will be applied.
-    value: 1000
+    value: '1000'
     type: 'number'
     options: []
     dependencies: []
