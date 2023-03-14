@@ -43,7 +43,7 @@ def send_data(processed_data: any) -> str:
                     {
                         "url": url,
                         "status_code": response.status_code,
-                        "message": response.reason,
+                        "message": response.text,
                     }
                 )
 

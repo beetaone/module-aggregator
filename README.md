@@ -3,7 +3,7 @@
 |                |                                       |
 | -------------- | ------------------------------------- |
 | Name           | Aggregator                           |
-| Version        | v1.0.1                                |
+| Version        | v1.0.2                                |
 | DockerHub | [weevenetwork/aggregator](https://hub.docker.com/r/weevenetwork/aggregator) |
 | authors        | Jakub Grzelak, Sanyam Arya                    |
 
