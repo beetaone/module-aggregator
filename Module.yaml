@@ -7,10 +7,10 @@ categories:                             # Array of category that will be used to
   - 'Aggregate'
 type: 'Processing'      # Module type (Input, Processing, Output) that will be used to group the module in the UI.
 image:
-  name: 'weevenetwork/aggregator'     # Image name from the docker registry.
+  name: 'beetaone/aggregator'     # Image name from the docker registry.
   tag: 'v1.0.2'                               # Image tag from the docker registry.
-  homepage: 'https://hub.docker.com/r/weevenetwork/aggregator'      # Image homepage from the docker registry.
-repository: 'https://github.com/weeve-modules/aggregator'     # Repository URL to source code.
+  homepage: 'https://hub.docker.com/r/beetaone/aggregator'      # Image homepage from the docker registry.
+repository: 'https://github.com/beetaone/module-aggregator'     # Repository URL to source code.
 envs:                                   # Array of environment variables that will be used to configure the module. Also used to show related fields on the UI.
   - name: Interval Unit                   # name of the field to be displayed on the UI.
     key: INTERVAL_UNIT                # key to set in the environment variables.
@@ -73,4 +73,4 @@ tags:
   - process
   - aggregation
   - functions
-icon: 'https://icons-020-demo.s3.eu-central-1.amazonaws.com/mi_aggregator_process.png'    # Icon URL that will be displayed in the UI.
+icon: 'https://icons-020-demo.s3.eu-central-1.amazonaws.com/mi_aggregator_process.png'    # Icon URL that will be displayed in the UI.he UI.

@@ -5,7 +5,7 @@ networks:
 services:
 
   boilerplate:
-    # image: weevenetwork/boilerplate
+    # image: beetaone/boilerplate
     build:
       context: ../
       dockerfile: docker/Dockerfile
@@ -43,4 +43,4 @@ services:
       - 9001:9001
     volumes:
       - $PWD/test/artifacts:/app/artifacts/
-    container_name: listener2
+    container_name: listener2ner2

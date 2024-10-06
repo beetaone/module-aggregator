@@ -11,5 +11,5 @@ COPY ./src /app/src
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
-# expose docker container port 80 according to weeve spec
+# expose docker container port 80 according to beetaone spec
 EXPOSE 80
